@@ -3,6 +3,8 @@ public class Main {
 
         RSA rsa = new RSA();
         rsa.generateKeyPair();
-        System.out.println((rsa.e * rsa.d) % rsa.phi.longValue() == 1);
+        // System.out.println(Math.pow(Math.pow(rsa.pp.longValue(), rsa.e), rsa.d) == rsa.pp.longValue() % rsa.m.longValue());
+        System.out.println(rsa.pp.longValue() + " ----- "  + rsa.m.longValue());
+        System.out.println(rsa.ggT(rsa.pp, rsa.m).equals(1));
     }
 }

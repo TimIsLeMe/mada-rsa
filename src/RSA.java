@@ -6,16 +6,21 @@ import java.util.Random;
 
 
 public class RSA {
-    public long d;
-    public long e;
-    private BigInteger pp;
-    public BigInteger phi;
-    private final static int RANDLIMIT = 1000;
-    private final static int RANDMIN = 500;
+    public BigInteger d;
+    public BigInteger e;
+    public BigInteger pp;
+    public BigInteger m;
+
+    private int rsaByteLength = 4; // 64 * 2 * 8 = 1024 bit -> which should be a reasonable length
+    private long randmax = (rsaByteLength) << rsaByteLength;
+    private long randmin = (rsaByteLength) << rsaByteLength / 2;
+
     public void generateKeyPair() {
-        this.pp = generatePrimeProduct(); // (n)
-        this.e = generateNonDiv(phi.longValue());
-        this.d = generateSecondNonDiv(phi.longValue(), e);
+        this.pp = generatePrimeProduct(); // n
+        System.out.println(this.pp);
+        System.out.println(randmax + " --- " + randmin);
+        this.e = generateNonDiv(m);
+        this.d = generateSecondNonDiv(m, e);
         String privateKey = "(" + pp.toString() + "," + d + ")";
         String publicKey = "(" + pp.toString() + "," + e + ")";
         try {
@@ -36,38 +41,43 @@ public class RSA {
     }
     public BigInteger generatePrimeProduct() {
         Random rnd = new Random();
-        byte[] bytes = new byte[16];
+        byte[] bytes = new byte[rsaByteLength];
         rnd.nextBytes(bytes);
         BigInteger p = BigInteger.probablePrime(bytes.length, rnd);
-        BigInteger q = BigInteger.probablePrime(bytes.length, rnd);
-        this.phi = (p.add(BigInteger.valueOf(-1l))).multiply(q.add(BigInteger.valueOf(-1l)));
+        BigInteger q;
+        do {
+           q = BigInteger.probablePrime(bytes.length, rnd);
+        }
+        while(q.equals(p));
+        this.m = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
         return p.multiply(q);
     }
-    public long generateNonDiv(long phi) {
+    public BigInteger generateNonDiv(BigInteger m) {
         Random rnd = new Random();
-        int numb;
+        long numb;
         do {
-            numb = rnd.nextInt(RANDLIMIT - RANDMIN + 1) + RANDMIN;
+            numb = rnd.nextLong(randmax - randmin + 1l) + randmin;
         }
-        while(ggT(phi, numb) != 1);
-        return numb;
+        while(!ggT(m, BigInteger.valueOf(numb)).equals(1));
+        return BigInteger.valueOf(numb);
     }
-    public long generateSecondNonDiv(long o, long div1) {
+    public BigInteger generateSecondNonDiv(BigInteger m, BigInteger div1) {
         Random rnd = new Random();
-        int numb;
+        long numb;
         do {
-            numb = rnd.nextInt(RANDLIMIT - RANDMIN + 1) + RANDMIN;
+            numb = rnd.nextLong(randmax - randmin + 1l) + randmin;
         }
-        while(div1 == numb && div1 * numb != 1 % o);
-        return numb;
+        while(div1.equals(numb) || !ggT(m, BigInteger.valueOf(numb)).equals(1));
+        return BigInteger.valueOf(numb);
     }
-    public long ggT(long num1, long num2) {
-        long divider = num1 < num2 ? num1 : num2;
-        while(divider > 1) {
-            if (num1 % divider == 0 && num2 % divider == 0) {
+    public BigInteger ggT(BigInteger num1, BigInteger num2) {
+        BigInteger divider = num1.compareTo(num2) > 0 ? num1 : num2;
+        //BigInteger divider = num1 < num2 ? num1 : num2;
+        while(divider.compareTo(BigInteger.valueOf(1)) > 0) {
+            if (num1.mod(divider).equals(0) && num2.mod(divider).equals(0)) {
                 return divider;
             }
-            divider--;
+            divider = divider.subtract(BigInteger.ONE);
         }
         return divider;
     }
