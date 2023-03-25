@@ -10,14 +10,12 @@ public class RSA {
     public BigInteger pp;
     public BigInteger m;
 
-    private int rsaByteLength = 8; // 64 * 2 * 8 = 1024 bit -> which should be a reasonable length
-    private long randmax = 1000;
-    private long randmin = 500;
+    private int rsaByteLength = 64; // 64 * 2 * 8 = 1024 bit -> which should be a reasonable length
+    private long randmax = 10000;
+    private long randmin = 1000;
 
     public void generateKeyPair() {
         this.pp = generatePrimeProduct(); // n
-        System.out.println(this.pp);
-        System.out.println(randmax + " --- " + randmin);
         this.e = generateNonDiv(m);
         this.d = generateSecondNonDiv(m, e);
         String privateKey = "(" + pp.toString() + "," + d + ")";
@@ -74,7 +72,7 @@ public class RSA {
         do {
             numb = rnd.nextLong(randmax - randmin + 1l) + randmin;
         }
-        while(!ggT(m, BigInteger.valueOf(numb)).equals(BigInteger.ONE));
+        while(EEA.ggT(m.longValue(), numb) != 1l);
         return BigInteger.valueOf(numb);
     }
     public BigInteger generateSecondNonDiv(BigInteger m, BigInteger div1) {
@@ -83,18 +81,18 @@ public class RSA {
         do {
             numb = rnd.nextLong(randmax - randmin + 1l) + randmin;
         }
-        while(div1.equals(BigInteger.valueOf(numb)) || !ggT(m, BigInteger.valueOf(numb)).equals(BigInteger.ONE));
+        while(div1.equals(BigInteger.valueOf(numb)) || EEA.ggT(m.longValue(), numb) != 1l);
         return BigInteger.valueOf(numb);
     }
-    public BigInteger ggT(BigInteger num1, BigInteger num2) {
-        BigInteger divider = num1.compareTo(num2) > 0 ? num1 : num2;
-        //BigInteger divider = num1 < num2 ? num1 : num2;
-        while(divider.compareTo(BigInteger.valueOf(1)) > 0) {
-            if (num1.mod(divider).equals(BigInteger.ZERO) && num2.mod(divider).equals(BigInteger.ZERO)) {
-                return divider;
-            }
-            divider = divider.subtract(BigInteger.ONE);
-        }
-        return divider;
-    }
+//    public BigInteger ggT(BigInteger num1, BigInteger num2) {
+//        BigInteger divider = num1.compareTo(num2) > 0 ? num1 : num2;
+//        //BigInteger divider = num1 < num2 ? num1 : num2;
+//        while(divider.compareTo(BigInteger.valueOf(1)) > 0) {
+//            if (num1.mod(divider).equals(BigInteger.ZERO) && num2.mod(divider).equals(BigInteger.ZERO)) {
+//                return divider;
+//            }
+//            divider = divider.subtract(BigInteger.ONE);
+//        }
+//        return divider;
+//    }
 }
