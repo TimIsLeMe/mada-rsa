@@ -35,7 +35,8 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/timho/Documents/IdeaProjects/mada-rsa"
+    "last_opened_file_path": "C:/Users/timho/Documents/IdeaProjects/mada-rsa",
+    "nodejs_package_manager_path": "npm"
   }
 }]]></component>
   <component name="RunManager">
@@ -63,7 +64,7 @@
       <workItem from="1679309105138" duration="9519000" />
       <workItem from="1679582326215" duration="3135000" />
       <workItem from="1679674494682" duration="31000" />
-      <workItem from="1679748516509" duration="4225000" />
+      <workItem from="1679748516509" duration="4858000" />
     </task>
     <servers />
   </component>
