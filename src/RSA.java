@@ -11,7 +11,7 @@ public class RSA {
     public BigInteger pp;
     public BigInteger m;
 
-    private int rsaByteLength = 32; // 64 * 2 * 8 = 1024 bit -> which should be a reasonable length
+    private int rsaByteLength = 8; // 64 * 2 * 8 = 1024 bit -> which should be a reasonable length
     private long randmax = 1000;
     private long randmin = 500;
 
