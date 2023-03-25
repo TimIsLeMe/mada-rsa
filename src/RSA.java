@@ -1,5 +1,4 @@
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
@@ -39,6 +38,23 @@ public class RSA {
             throw exception;
         }
     }
+
+    public char[] readFile(String fileName) throws IOException {
+        try {
+            File file = new File(fileName);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String s = "";
+            String line;
+            while ((line = br.readLine()) != null) {
+                s += line;
+            }
+            return s.toCharArray();
+        }
+        catch(IOException exception) {
+            throw exception;
+        }
+    }
+
     public BigInteger generatePrimeProduct() {
         Random rnd = new Random();
         byte[] bytes = new byte[rsaByteLength];
