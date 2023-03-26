@@ -3,6 +3,8 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class RSA {
@@ -46,6 +48,7 @@ public class RSA {
             String line;
             while ((line = br.readLine()) != null) {
                 s += line;
+                if(br.ready()) s += "\n";
             }
             return s.toCharArray();
         }
@@ -135,13 +138,26 @@ public class RSA {
     public String decrypt(String message) {
         String decode = "";
         String[] smt = message.split(",");
+        long localD = getPrivateKey();
         for(String oy : smt) {
             long lo = Long.parseLong(oy);
-            long why = crypt(lo, d.longValue());
+            long why = crypt(lo, localD);
             char cha = (char)why;
             decode = decode + cha;
         }
         return decode;
+    }
+    public long getPrivateKey() {
+        char[] sk = readFile("sk.txt");
+        int i = 0;
+        boolean passedComma = false;
+        String pKey = "";
+        while(i < sk.length - 1) {
+            if(passedComma) pKey += sk[i];
+            else passedComma = ',' == sk[i];
+            i++;
+        }
+        return Long.valueOf(pKey);
     }
 
 }
