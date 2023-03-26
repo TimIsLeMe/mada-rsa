@@ -11,16 +11,16 @@ public class RSA {
     public BigInteger pp;
     public BigInteger m;
 
-    private int rsaByteLength = 8;
+    private int rsaByteLength = 16;
     private long randmax = 128;
     private long randmin = 64;
 
-    public void generateKeyPair() {
+    public void generateKeyPair() { // generates the key pair and also writes the files sk.txt and pk.txt
         this.pp = generatePrimeProduct(); // n
         this.e = generateNonDiv(m);
         this.d = BigInteger.valueOf(EEA.inverseGGT(m.longValue(), e.longValue()));
-        String privateKey = "(" + pp.toString() + "," + d + ")";
-        String publicKey = "(" + pp.toString() + "," + e + ")";
+        String privateKey = "(" + pp.toString() + "," + d.toString() + ")";
+        String publicKey = "(" + pp.toString() + "," + e.toString() + ")";
         try {
             writeFile("sk.txt", privateKey);
             writeFile("pk.txt", publicKey);
@@ -34,7 +34,7 @@ public class RSA {
             fs.write(content.getBytes(StandardCharsets.UTF_8));
         }
         catch(IOException exception) {
-
+            throw new RuntimeException("error while writing file");
         }
     }
 
@@ -50,11 +50,10 @@ public class RSA {
             return s.toCharArray();
         }
         catch(IOException exception) {
-            //don't
-            return null;
+            throw new RuntimeException("error while reading file");
         }
     }
-
+    // extended exponential algorithm:
     public long crypt(long x, long exponent) {
 
         long h = 1L; // h is always 1
@@ -102,7 +101,8 @@ public class RSA {
 
     public BigInteger generatePrimeProduct() {
         Random rnd = new Random();
-        byte[] bytes = new byte[rsaByteLength];
+        // because both primes are multiplied the product has a byte length of: 2 * rsaByteLength / 2 == rsaByteLength
+        byte[] bytes = new byte[rsaByteLength >> 1];
         rnd.nextBytes(bytes);
         BigInteger p = BigInteger.probablePrime(bytes.length, rnd);
         BigInteger q;
@@ -122,24 +122,26 @@ public class RSA {
         while(EEA.ggT(m.longValue(), numb) != 1l);
         return BigInteger.valueOf(numb);
     }
-    public BigInteger generateSecondNonDiv(BigInteger m, BigInteger div1) {
-        Random rnd = new Random();
-        long numb;
-        do {
-            numb = rnd.nextLong(randmax - randmin + 1l) + randmin;
+    public String encrypt(char[] message) {
+        String s = "";
+        long l;
+
+        for (int i = 0; i < message.length; i++) {
+            l = crypt(message[i], e.longValue());
+            s = s + l + ((i == message.length - 1) ? "" : ",");
         }
-        while(div1.equals(BigInteger.valueOf(numb)) || EEA.ggT(m.longValue(), numb * div1.longValue()) != 1l);
-        return BigInteger.valueOf(numb);
+        return s;
     }
-//    public BigInteger ggT(BigInteger num1, BigInteger num2) {
-//        BigInteger divider = num1.compareTo(num2) > 0 ? num1 : num2;
-//        //BigInteger divider = num1 < num2 ? num1 : num2;
-//        while(divider.compareTo(BigInteger.valueOf(1)) > 0) {
-//            if (num1.mod(divider).equals(BigInteger.ZERO) && num2.mod(divider).equals(BigInteger.ZERO)) {
-//                return divider;
-//            }
-//            divider = divider.subtract(BigInteger.ONE);
-//        }
-//        return divider;
-//    }
+    public String decrypt(String message) {
+        String decode = "";
+        String[] smt = message.split(",");
+        for(String oy : smt) {
+            long lo = Long.parseLong(oy);
+            long why = crypt(lo, d.longValue());
+            char cha = (char)why;
+            decode = decode + cha;
+        }
+        return decode;
+    }
+
 }

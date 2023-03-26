@@ -35,16 +35,16 @@ public class EEA {
             }
             while(r != 0l && b > 0l);
             while (y0 < 0) {
-                y0 += initialA;
+                y0 += initialA; //make sure y0 is > 0
             }
         }
 
         public long getGGT(){
-            return x0 * initialA + y0 * initialB;
+            return x0 * initialA + y0 * initialB; // normal ggT result
         }
 
         public long getInverseGGT(){
-            return y0;
+            return y0; // for getting the private key -> d
         }
     }
 }
