@@ -11,7 +11,7 @@ public class EEA {
     }
 
     private static class Res {
-        public long x0 = 1l, x1 = 0l, y0 = 0l, y1 = 1l, q, r, initialA, initialB;
+        public long x0, x1, y0, y1, q, r, initialA, initialB;
         public Res(long num1, long num2) {
             x0 = 1l;
             x1 = 0l;
@@ -34,6 +34,9 @@ public class EEA {
                 b = r;
             }
             while(r != 0l && b > 0l);
+            while (y0 < 0) {
+                y0 += initialA;
+            }
         }
 
         public long getGGT(){

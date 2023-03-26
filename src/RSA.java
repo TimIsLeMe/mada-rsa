@@ -11,9 +11,9 @@ public class RSA {
     public BigInteger pp;
     public BigInteger m;
 
-    private int rsaByteLength = 16; // 64 * 2 * 8 = 1024 bit -> which should be a reasonable length
-    private long randmax = 10000;
-    private long randmin = 1000;
+    private int rsaByteLength = 8;
+    private long randmax = 128;
+    private long randmin = 64;
 
     public void generateKeyPair() {
         this.pp = generatePrimeProduct(); // n
