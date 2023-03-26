@@ -1,6 +1,7 @@
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -25,21 +26,21 @@ public class RSA {
         try {
             writeFile("sk.txt", privateKey);
             writeFile("pk.txt", publicKey);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
-    public void writeFile(String fileName, String content) throws IOException {
+    public void writeFile(String fileName, String content) {
         try {
             FileOutputStream fs = new FileOutputStream(fileName);
             fs.write(content.getBytes(StandardCharsets.UTF_8));
         }
         catch(IOException exception) {
-            throw exception;
+
         }
     }
 
-    public char[] readFile(String fileName) throws IOException {
+    public char[] readFile(String fileName) {
         try {
             File file = new File(fileName);
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -51,8 +52,54 @@ public class RSA {
             return s.toCharArray();
         }
         catch(IOException exception) {
-            throw exception;
+            //don't
+            return null;
         }
+    }
+
+    public long crypt(long x, long exponent) {
+
+        long h = 1L; // h is always 1
+        long k = x;
+
+        int[] b = b(exponent); // get array
+
+        for(int i = b.length-1; i >= 0; i--) {
+            if(b[i] == 1) {
+                h = h * k % this.pp.longValue();
+            }
+            if(i != 0) {
+                k = k * k % this.pp.longValue();
+            }
+        }
+        return h;
+    }
+
+    public int[] b(long x) {
+
+        int[] ia = new int[64];
+        int i = 0;
+        while(x != 0L) {
+            ia[i] = x%2==0 ? 0 : 1;
+            i++;
+            x = x >>> 1;
+        }
+        return reverseAndCut(ia);
+    }
+
+    private int[] reverseAndCut(int[] ia) {
+        int newLength = 0;
+        for (int i = ia.length -1; i >= 0; i--) {
+            if(ia[i] == 1) {
+                newLength = i + 1;
+                break;
+            }
+        }
+        int[] result = new int[newLength];
+        for(int i = 0; i < result.length; i++) {
+            result[i] = ia[result.length - i - 1];
+        }
+        return result;
     }
 
     public BigInteger generatePrimeProduct() {
