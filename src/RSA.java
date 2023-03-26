@@ -11,7 +11,7 @@ public class RSA {
     public BigInteger pp;
     public BigInteger m;
 
-    private int rsaByteLength = 64; // 64 * 2 * 8 = 1024 bit -> which should be a reasonable length
+    private int rsaByteLength = 16; // 64 * 2 * 8 = 1024 bit -> which should be a reasonable length
     private long randmax = 10000;
     private long randmin = 1000;
 
@@ -128,7 +128,7 @@ public class RSA {
         do {
             numb = rnd.nextLong(randmax - randmin + 1l) + randmin;
         }
-        while(div1.equals(BigInteger.valueOf(numb)) || EEA.ggT(m.longValue(), numb) != 1l);
+        while(div1.equals(BigInteger.valueOf(numb)) || EEA.ggT(m.longValue(), numb * div1.longValue()) != 1l);
         return BigInteger.valueOf(numb);
     }
 //    public BigInteger ggT(BigInteger num1, BigInteger num2) {

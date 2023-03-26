@@ -7,12 +7,12 @@ public class Main {
         System.out.println(rsa.pp.longValue() + " ----- "  + rsa.m.longValue());
         System.out.println(EEA.ggT(rsa.pp.longValue(), rsa.m.longValue()) == 1);
 
-        rsa.pp = BigInteger.valueOf(33);
-        rsa.m = BigInteger.valueOf(20);
-        rsa.e = BigInteger.valueOf(7);
-        rsa.d = BigInteger.valueOf(3);
-        long garbage = rsa.crypt(11, 38);
-        System.out.println(garbage);
+//        rsa.pp = BigInteger.valueOf(33);
+//        rsa.m = BigInteger.valueOf(20);
+//        rsa.e = BigInteger.valueOf(7);
+//        rsa.d = BigInteger.valueOf(3);
+//        long garbage = rsa.crypt(11, 38);
+//        System.out.println(garbage);
 
         String s = "";
         long l;
