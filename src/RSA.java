@@ -18,7 +18,7 @@ public class RSA {
     public void generateKeyPair() {
         this.pp = generatePrimeProduct(); // n
         this.e = generateNonDiv(m);
-        this.d = generateSecondNonDiv(m, e);
+        this.d = BigInteger.valueOf(EEA.inverseGGT(m.longValue(), e.longValue()));
         String privateKey = "(" + pp.toString() + "," + d + ")";
         String publicKey = "(" + pp.toString() + "," + e + ")";
         try {
