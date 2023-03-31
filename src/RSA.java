@@ -3,8 +3,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class RSA {
@@ -13,14 +11,14 @@ public class RSA {
     public BigInteger pp;
     public BigInteger m;
 
-    private int rsaByteLength = 16;
+    private int rsaByteLength = 2048;
     private long randmax = 128;
     private long randmin = 64;
 
     public void generateKeyPair() { // generates the key pair and also writes the files sk.txt and pk.txt
         this.pp = generatePrimeProduct(); // n
         this.e = generateNonDiv(m);
-        this.d = BigInteger.valueOf(EEA.inverseGGT(m.longValue(), e.longValue()));
+        this.d = EEA.inverseGGT(m, e);
         String privateKey = "(" + pp.toString() + "," + d.toString() + ")";
         String publicKey = "(" + pp.toString() + "," + e.toString() + ")";
         try {
@@ -57,32 +55,32 @@ public class RSA {
         }
     }
     // extended exponential algorithm:
-    public long crypt(long x, long exponent) {
+    public BigInteger crypt(BigInteger x, BigInteger exponent) {
 
-        long h = 1L; // h is always 1
-        long k = x;
+        BigInteger h = BigInteger.ONE; // h is always 1
+        BigInteger k = x;
 
         int[] b = b(exponent); // get array
 
         for(int i = b.length-1; i >= 0; i--) {
             if(b[i] == 1) {
-                h = h * k % this.pp.longValue();
+                h = h.multiply(k).mod(this.pp);
             }
             if(i != 0) {
-                k = k * k % this.pp.longValue();
+                k = k.multiply(k).mod(this.pp);
             }
         }
         return h;
     }
 
-    public int[] b(long x) {
-
-        int[] ia = new int[64];
+    public int[] b(BigInteger x) {
+        int[] ia = new int[2048];
         int i = 0;
-        while(x != 0L) {
-            ia[i] = x%2==0 ? 0 : 1;
+        while(x.compareTo(BigInteger.ZERO) > 0) {
+            ia[i] = x.mod(BigInteger.TWO).equals(BigInteger.ZERO) ? 0 : 1;
             i++;
-            x = x >>> 1;
+            x = x.shiftRight(1);
+            //x = x >>> 1;
         }
         return reverseAndCut(ia);
     }
@@ -122,15 +120,14 @@ public class RSA {
         do {
             numb = rnd.nextLong(randmax - randmin + 1l) + randmin;
         }
-        while(EEA.ggT(m.longValue(), numb) != 1l);
+        while(!EEA.ggT(m, BigInteger.valueOf(numb)).equals(BigInteger.ONE));
         return BigInteger.valueOf(numb);
     }
     public String encrypt(char[] message) {
         String s = "";
-        long l;
-
+        BigInteger l;
         for (int i = 0; i < message.length; i++) {
-            l = crypt(message[i], e.longValue());
+            l = crypt(BigInteger.valueOf((long) message[i]), e);
             s = s + l + ((i == message.length - 1) ? "" : ",");
         }
         return s;
@@ -138,26 +135,35 @@ public class RSA {
     public String decrypt(String message) {
         String decode = "";
         String[] smt = message.split(",");
-        long localD = getPrivateKey();
         for(String oy : smt) {
-            long lo = Long.parseLong(oy);
-            long why = crypt(lo, localD);
-            char cha = (char)why;
+            BigInteger lo = new BigInteger(oy);
+            BigInteger asciiCode = crypt(lo, d);
+            /*char cha = (char) asciiCode;
             decode = decode + cha;
+             */
+            String cha = new String(asciiCode.toByteArray());
+            decode += cha;
         }
         return decode;
     }
-    public long getPrivateKey() {
+    public void setPrivateKey() {
         char[] sk = readFile("sk.txt");
-        int i = 0;
+        if(sk.length < 4) throw new RuntimeException("invalid private key");
+        int i = 1; // start after bracket
         boolean passedComma = false;
         String pKey = "";
+        String newPP = "";
+        int commaInd = 0;
         while(i < sk.length - 1) {
             if(passedComma) pKey += sk[i];
-            else passedComma = ',' == sk[i];
+            else {
+                passedComma = ',' == sk[i];
+            }
+            if(!passedComma) newPP += sk[i];
             i++;
         }
-        return Long.valueOf(pKey);
+        this.pp = new BigInteger(newPP);
+        this.d = new BigInteger(pKey);
     }
 
 }
